@@ -15,15 +15,12 @@ class TextNode:
         self.url = url
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, TextNode):
-            return False
-        if self.text_type != other.text_type:
-            return False
-        if self.url != other.url:
-            return False
-        if self.text != other.text:
-            return False
-        return True
+        return (
+            # isinstance(other, TextNode)
+            self.text_type == other.text_type
+            and self.url == other.url
+            and self.text == other.text
+        )
 
     def __repr__(self) -> str:
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
