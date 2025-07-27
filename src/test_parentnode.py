@@ -3,7 +3,7 @@ import unittest
 from htmlnode import LeafNode, ParentNode
 
 
-class TestTextNode(unittest.TestCase):
+class TestParentNode(unittest.TestCase):
     def test_to_html_single_child(self):
         node = ParentNode("p", [LeafNode("","text")])
         self.assertEqual("<p>text</p>", node.to_html())

@@ -3,7 +3,7 @@ import unittest
 from htmlnode import HTMLNode
 
 
-class TestTextNode(unittest.TestCase):
+class TestHTMLNode(unittest.TestCase):
     def test_props_to_html_empty(self):
         node = HTMLNode()
         self.assertEqual("", node.props_to_html())
@@ -33,8 +33,8 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual("HTMLNode(tag=None, value='Hello HTML!', children=None, props=None)",repr(node))
 
     def test_children_repr(self):
-        node = HTMLNode(children=["div","p"])
-        self.assertEqual("HTMLNode(tag=None, value=None, children=['div', 'p'], props=None)",repr(node))
+        node = HTMLNode(children=[None, None]) # type: ignore
+        self.assertEqual("HTMLNode(tag=None, value=None, children=[None, None], props=None)",repr(node))
 
 
     def test_props_repr(self):

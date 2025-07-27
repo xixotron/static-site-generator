@@ -3,7 +3,7 @@ import unittest
 from htmlnode import LeafNode
 
 
-class TestTextNode(unittest.TestCase):
+class TestLeafNode(unittest.TestCase):
     def test_to_html_no_tag(self):
         node = LeafNode(None, "This is only text")
         self.assertEqual("This is only text", node.to_html())
