@@ -22,24 +22,26 @@ class TestTextNode(unittest.TestCase):
 
     def test_empty_repr(self):
         node = HTMLNode()
-        self.assertEqual("HTMLNode()",repr(node))
+        self.assertEqual("HTMLNode(tag=None, value=None, children=None, props=None)",repr(node))
 
     def test_tag_repr(self):
         node = HTMLNode("a")
-        self.assertEqual("HTMLNode(tag=a)",repr(node))
+        self.assertEqual("HTMLNode(tag='a', value=None, children=None, props=None)",repr(node))
 
     def test_value_repr(self):
         node = HTMLNode(value="Hello HTML!")
-        self.assertEqual("HTMLNode(value=Hello HTML!)",repr(node))
+        self.assertEqual("HTMLNode(tag=None, value='Hello HTML!', children=None, props=None)",repr(node))
 
     def test_children_repr(self):
-        node = HTMLNode(children=[HTMLNode(),])
-        self.assertEqual("HTMLNode(children=[HTMLNode()])",repr(node))
+        node = HTMLNode(children=["div","p"])
+        self.assertEqual("HTMLNode(tag=None, value=None, children=['div', 'p'], props=None)",repr(node))
 
 
     def test_props_repr(self):
         node = HTMLNode(props={"href": "boot.dev", "target": "_blank"})
-        self.assertEqual("HTMLNode(props={'href': 'boot.dev', 'target': '_blank'})", repr(node))
+        self.assertEqual(
+            "HTMLNode(tag=None, value=None, children=None, props={'href': 'boot.dev', 'target': '_blank'})",
+            repr(node))
 
 
 if __name__ == "__main__":
