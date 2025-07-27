@@ -4,27 +4,27 @@ from leafnode import LeafNode
 
 
 class TestTextNode(unittest.TestCase):
-    def test_value_to_html(self):
+    def test_to_html_no_tag(self):
         node = LeafNode(None, "This is only text")
         self.assertEqual("This is only text", node.to_html())
 
-    def test_value_and_tag_to_html(self):
+    def test_to_html_p(self):
         node = LeafNode("p", "This is a paragraph")
         self.assertEqual("<p>This is a paragraph</p>", node.to_html())
 
-    def test_value_tag_and_props_to_html(self):
+    def test_to_html_a(self):
         node = LeafNode("a", "This is a link", {"href":"https://boot.dev"})
         self.assertEqual('<a href="https://boot.dev">This is a link</a>', node.to_html())
 
-    def test_to_html_empty_value_raisesError(self):
+    def test_to_html_no_value_Exception(self):
 
         node = LeafNode("p", None)  # type:ignore value should be a str
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             html = node.to_html()
             self.assertIsNone(html)
 
         self.assertNotIn("html", locals())
-        self.assertTrue("LeafNode" in str(context.exception))
+        self.assertTrue("invalid HTML: no value" in str(context.exception))
 
 
 if __name__ == "__main__":
