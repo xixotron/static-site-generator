@@ -1,6 +1,6 @@
 import unittest
 
-from md_parser import extract_markdown_images, extract_markdown_links, split_nodes_delimiter
+from md_parser import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 from textnode import TextNode, TextType
 
@@ -104,7 +104,7 @@ class TestMDParser(unittest.TestCase):
         self.assertEqual("SyntaxError: Delimiter '**' was never closed", str(context.exception))
 
 
-class TestExtractMarkdownLinksImages(unittest.TestCase):
+class TestExtractMarkdownImages(unittest.TestCase):
     def test_Extract_images(self):
         text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
         self.assertListEqual(
@@ -122,6 +122,8 @@ class TestExtractMarkdownLinksImages(unittest.TestCase):
             ],
             extract_markdown_images(text))
 
+
+class TestExtractMarkdownLinks(unittest.TestCase):
     def test_Extract_links(self):
         text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
         self.assertListEqual(
@@ -139,6 +141,135 @@ class TestExtractMarkdownLinksImages(unittest.TestCase):
             ],
             extract_markdown_links(text))
 
+
+class TestSplitNodesLink(unittest.TestCase):
+    def test_unmodified_text_without_links(self):
+        text_node = TextNode("This text contains no links", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains no links", TextType.TEXT)
+            ],
+            split_nodes_link([text_node])
+        )
+
+    def test_extract_one_link(self):
+        text_node = TextNode("This text contains [one](url.link) link", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains ", TextType.TEXT),
+                TextNode("one", TextType.LINK, "url.link"),
+                TextNode(" link", TextType.TEXT)
+            ],
+            split_nodes_link([text_node])
+        )
+
+    def test_extract_two_different_links(self):
+        text_node = TextNode("This text contains [one](url.link) link [or more](https://google.com)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains ", TextType.TEXT),
+                TextNode("one", TextType.LINK, "url.link"),
+                TextNode(" link ", TextType.TEXT),
+                TextNode("or more", TextType.LINK, "https://google.com"),
+            ],
+            split_nodes_link([text_node])
+        )
+
+    def test_extract_all_text_as_link(self):
+        text_node = TextNode("[this is a single link](https://www.freecatphotoapp.com/)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("this is a single link", TextType.LINK, "https://www.freecatphotoapp.com/"),
+            ],
+            split_nodes_link([text_node])
+        )
+
+    def test_extract_same_link_multiple_times(self):
+        text_node = TextNode("This text's [link](https://www.google.com/search?q=recursion) is a recursive [link](https://www.google.com/search?q=recursion)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text's ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://www.google.com/search?q=recursion"),
+                TextNode(" is a recursive ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://www.google.com/search?q=recursion"),
+            ],
+            split_nodes_link([text_node])
+        )
+
+    def test_extract_one_link_ignore_images(self):
+        text_node = TextNode("This text contains ![one](url.image) image [or more](https://google.com)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains ![one](url.image) image ", TextType.TEXT),
+                TextNode("or more", TextType.LINK, "https://google.com"),
+            ],
+            split_nodes_link([text_node])
+        )
+
+class TestSplitNodesImage(unittest.TestCase):
+    def test_unmodified_text_without_images(self):
+        text_node = TextNode("This text contains no links", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains no links", TextType.TEXT)
+            ],
+            split_nodes_image([text_node])
+        )
+
+    def test_extract_one_image(self):
+        text_node = TextNode("This text contains ![one](url.image) image", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains ", TextType.TEXT),
+                TextNode("one", TextType.IMAGE, "url.image"),
+                TextNode(" image", TextType.TEXT)
+            ],
+            split_nodes_image([text_node])
+        )
+
+    def test_extract_two_different_images(self):
+        text_node = TextNode("This text contains ![one](url.image) image ![or more](https://google.com)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains ", TextType.TEXT),
+                TextNode("one", TextType.IMAGE, "url.image"),
+                TextNode(" image ", TextType.TEXT),
+                TextNode("or more", TextType.IMAGE, "https://google.com"),
+            ],
+            split_nodes_image([text_node])
+        )
+
+    def test_extract_all_text_as_image(self):
+        text_node = TextNode("![this is a single image](https://s3.amazonaws.com/freecodecamp/running-cats.jpg)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("this is a single image", TextType.IMAGE, "https://s3.amazonaws.com/freecodecamp/running-cats.jpg"),
+            ],
+            split_nodes_image([text_node])
+        )
+
+    def test_extract_same_image_multiple_times(self):
+        text_node = TextNode("This text's ![image](https://imgs.xkcd.com/comics/loop.png) is a loop ![image](https://imgs.xkcd.com/comics/loop.png)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text's ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://imgs.xkcd.com/comics/loop.png"),
+                TextNode(" is a loop ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://imgs.xkcd.com/comics/loop.png"),
+            ],
+            split_nodes_image([text_node])
+        )
+
+    def test_extract_one_image_ignore_link(self):
+        text_node = TextNode("This text contains ![one](url.image) image [or more](https://google.com)", TextType.TEXT)
+        self.assertListEqual(
+            [
+                TextNode("This text contains ", TextType.TEXT),
+                TextNode("one", TextType.IMAGE, "url.image"),
+                TextNode(" image [or more](https://google.com)", TextType.TEXT),
+            ],
+            split_nodes_image([text_node])
+        )
 
 
 if __name__ == "__main__":
