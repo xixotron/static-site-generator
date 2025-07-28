@@ -1,6 +1,6 @@
 import unittest
 
-from md_parser import split_nodes_delimiter
+from md_parser import extract_markdown_images, extract_markdown_links, split_nodes_delimiter
 
 from textnode import TextNode, TextType
 
@@ -102,6 +102,43 @@ class TestMDParser(unittest.TestCase):
 
         self.assertIsInstance(context.exception, SyntaxError)
         self.assertEqual("SyntaxError: Delimiter '**' was never closed", str(context.exception))
+
+
+class TestExtractMarkdownLinksImages(unittest.TestCase):
+    def test_Extract_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        self.assertListEqual(
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")
+            ],
+            extract_markdown_images(text))
+
+    def test_extract_only_images(self):
+        text = "This is text with a image ![rick roll](https://i.imgur.com/aKaOqIh.gif) and a link [to youtube](https://www.youtube.com/@bootdotdev)"
+        self.assertListEqual(
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+            ],
+            extract_markdown_images(text))
+
+    def test_Extract_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        self.assertListEqual(
+            [
+                ("to boot dev", "https://www.boot.dev"),
+                ("to youtube", "https://www.youtube.com/@bootdotdev")
+            ],
+            extract_markdown_links(text))
+
+    def test_extract_only_links(self):
+        text = "This is text with a image ![rick roll](https://i.imgur.com/aKaOqIh.gif) and a link [to youtube](https://www.youtube.com/@bootdotdev)"
+        self.assertListEqual(
+            [
+                ("to youtube", "https://www.youtube.com/@bootdotdev"),
+            ],
+            extract_markdown_links(text))
+
 
 
 if __name__ == "__main__":
