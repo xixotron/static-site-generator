@@ -1,6 +1,6 @@
 import unittest
 
-from md_parser import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link
+from md_parser import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
 
 from textnode import TextNode, TextType
 
@@ -269,6 +269,79 @@ class TestSplitNodesImage(unittest.TestCase):
                 TextNode(" image [or more](https://google.com)", TextType.TEXT),
             ],
             split_nodes_image([text_node])
+        )
+
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_multiple_different_nodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            text_to_textnodes(text)
+        )
+    def test_single_text_node(self):
+        text = "This is a text without any markdown inline element!"
+        self.assertListEqual(
+            [
+                TextNode("This is a text without any markdown inline element!",TextType.TEXT)
+            ],
+            text_to_textnodes(text)
+        )
+
+    def test_single_bold_node(self):
+        text = "**This is a single bold node!**"
+        self.assertListEqual(
+            [
+                TextNode("This is a single bold node!",TextType.BOLD)
+            ],
+            text_to_textnodes(text)
+        )
+
+    def test_single_italic_node(self):
+        text = "_This is a single italic node!_"
+        self.assertListEqual(
+            [
+                TextNode("This is a single italic node!",TextType.ITALIC)
+            ],
+            text_to_textnodes(text)
+        )
+
+    def test_single_code_node(self):
+        text = "`This is a single code node!`"
+        self.assertListEqual(
+            [
+                TextNode("This is a single code node!",TextType.CODE)
+            ],
+            text_to_textnodes(text)
+        )
+
+    def test_single_link_node(self):
+        text = "[This is a single link](https://link.somewhere)"
+        self.assertListEqual(
+            [
+                TextNode("This is a single link",TextType.LINK, url="https://link.somewhere")
+            ],
+            text_to_textnodes(text)
+        )
+
+    def test_single_image_node(self):
+        text = "![This is a single image](https://image.of.something)"
+        self.assertListEqual(
+            [
+                TextNode("This is a single image",TextType.IMAGE, url="https://image.of.something")
+            ],
+            text_to_textnodes(text)
         )
 
 
