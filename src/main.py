@@ -11,7 +11,7 @@ def main():
     if len(sys.argv) >= 2:
         basepath = sys.argv[1]
 
-    print(basepath)
+    print(f"{basepath=}")
     public_path = "./docs"
     static_path = "./static"
     content_path = "./content"

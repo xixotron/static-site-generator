@@ -5,7 +5,7 @@ import re
 from markdown_to_html import markdown_to_html_node
 
 def generate_pages_recursive(dir_path_content : str, template_path : str, dest_dir_path :str, basepath : str):
-    print(f"generate_pages_recursive({dir_path_content}, {template_path}, {dest_dir_path})")
+    print(f"generate_pages_recursive({dir_path_content}, {template_path}, {dest_dir_path}, {basepath})")
 
     if not os.path.exists(dest_dir_path):
         print(f"Folder {dest_dir_path} not found, creating ...")
@@ -37,7 +37,9 @@ def generate_page(from_path : str, template_path : str, dest_path : str,  basepa
 
     page = template.replace("{{ Title }}", title)
     page = page.replace("{{ Content }}", content)
-    page.replace('href="/', f'href="{basepath}')
+
+    page = page.replace('href="/', f'href="{basepath}')
+    page = page.replace('src="/', f'src="{basepath}')
 
     dest_dir = os.path.dirname(dest_path)
     if not os.path.exists(dest_dir):
