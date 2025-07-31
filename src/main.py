@@ -1,15 +1,18 @@
 import os
 import shutil
+import sys
 
 from copytree import copy_tree
 from gencontent import generate_pages_recursive
 
 
 def main():
-    cwd = os.getcwd()
-    print(f"{cwd=}")
+    basepath = "/"
+    if len(sys.argv) >= 2:
+        basepath = sys.argv[1]
 
-    public_path = "./public"
+    print(basepath)
+    public_path = "./docs"
     static_path = "./static"
     content_path = "./content"
     template_path = "./template.html"
@@ -26,7 +29,7 @@ def main():
 
 
     print("Generatin from content...")
-    generate_pages_recursive(content_path, template_path, public_path)
+    generate_pages_recursive(content_path, template_path, public_path, basepath)
 
 
 if __name__ == "__main__":

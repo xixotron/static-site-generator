@@ -4,7 +4,7 @@ import re
 
 from markdown_to_html import markdown_to_html_node
 
-def generate_pages_recursive(dir_path_content : str, template_path : str, dest_dir_path :str):
+def generate_pages_recursive(dir_path_content : str, template_path : str, dest_dir_path :str, basepath : str):
     print(f"generate_pages_recursive({dir_path_content}, {template_path}, {dest_dir_path})")
 
     if not os.path.exists(dest_dir_path):
@@ -18,12 +18,12 @@ def generate_pages_recursive(dir_path_content : str, template_path : str, dest_d
         if os.path.isfile(from_path) and file.endswith(".md"):
             html_file = file.replace(".md", ".html")
             dest_path = os.path.join(dest_dir_path, html_file)
-            generate_page(from_path, template_path, dest_path)
+            generate_page(from_path, template_path, dest_path, basepath)
         elif os.path.isdir(from_path):
-            generate_pages_recursive(from_path, template_path, dest_path)
+            generate_pages_recursive(from_path, template_path, dest_path, basepath)
 
 
-def generate_page(from_path : str, template_path : str, dest_path : str):
+def generate_page(from_path : str, template_path : str, dest_path : str,  basepath : str):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(from_path, "r") as f:
@@ -37,6 +37,7 @@ def generate_page(from_path : str, template_path : str, dest_path : str):
 
     page = template.replace("{{ Title }}", title)
     page = page.replace("{{ Content }}", content)
+    page.replace('href="/', f'href="{basepath}')
 
     dest_dir = os.path.dirname(dest_path)
     if not os.path.exists(dest_dir):
