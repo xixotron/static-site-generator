@@ -12,7 +12,7 @@ class BlockType(Enum):
     ORDERED_LIST    = "ordered_list"
 
 
-def block_to_block_type(block: str) ->BlockType:
+def block_to_block_type(block: str) -> BlockType:
     matches = re.fullmatch(r"^#{1,6} [^\n]*$", block)
     if matches:
         return BlockType.HEADING
@@ -51,5 +51,4 @@ def markdown_to_blocks(markdown: str) -> list[str]:
             continue
         blocks.append(block.strip())
     return blocks
-
 
