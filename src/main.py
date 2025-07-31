@@ -1,21 +1,52 @@
+import os
+import shutil
+
 from textnode import *
 from md_parser import extract_markdown_links, split_nodes_delimiter, extract_markdown_images, split_nodes_link
 
 def main():
+    cwd = os.getcwd()
+    print(f"{cwd=}")
 
-    text_node = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")
-    print(text_node)
-    text_node = TextNode("This is a _italic_ text with a `code block` in between", TextType.TEXT)
-    nodes = split_nodes_delimiter([text_node], "`", TextType.CODE)
-    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
-    print(nodes)
-    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
-    print(extract_markdown_images(text))
-    text_node = TextNode(
-        "This is text two links to [boot dev](https://boot.dev) and a link to [boot dev](https://boot.dev) and some extra text",
-        TextType.TEXT
-    )
-    print(split_nodes_link([text_node]))
+    copy_static_to_to_public(cwd)
+
+def copy_static_to_to_public(cwd):
+    static_path = os.path.join(cwd, "static")
+    public_path = os.path.join(cwd, "public")
+    if not os.path.exists(static_path):
+        raise FileNotFoundError(f"Static route: '{static_path}' not found")
+
+    if os.path.exists(public_path):
+        shutil.rmtree(public_path)
+
+    os.mkdir(public_path)
+
+    copy_tree(static_path, public_path)
+
+def copy_tree(src, dst):
+    folders = ["."]
+    while len(folders) > 0:
+        cur_dir = folders.pop(0)
+        print(f"folder {cur_dir}:")
+        src_path = os.path.join(src, cur_dir)
+        dst_path = os.path.join(dst, cur_dir)
+        copy_files_in_folder(src_path, dst_path)
+
+        for file in os.listdir(src_path):
+            partial_file_path = cur_dir + "/" + file
+            file_path = os.path.join(src, partial_file_path)
+            if os.path.isdir(file_path):
+                folders.append(partial_file_path)
+
+
+def copy_files_in_folder(src, dst):
+    for file in os.listdir(src):
+        src_path = os.path.join(src, file)
+        dst_path = os.path.join(dst, file)
+        if os.path.isfile(src_path):
+            print(f"Copy: '{src_path}' to '{dst_path}'")
+            shutil.copy(src_path, dst_path)
+
 
 if __name__ == "__main__":
     main()
