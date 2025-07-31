@@ -51,17 +51,30 @@ the **same** even with inline stuff
         md = "> This might be quoted in the future."
         node = markdown_to_html_node(md)
         self.assertEqual(
-            "<div><blockquote><p>This might be quoted in the future.</p></blockquote></div>",
+            "<div><blockquote>This might be quoted in the future.</blockquote></div>",
             node.to_html()
         )
 
     def test_multi_line_quote_block(self):
-        md = "> This quote\n> might be split\n> in multiple\n> lines"
+        md = """
+> This quote
+> might be split
+> in multiple
+> lines
+>
+> ---Someone
+"""
         node = markdown_to_html_node(md)
         self.assertEqual(
-            "<div><blockquote><p>This quote\nmight be split\nin multiple\nlines</p></blockquote></div>",
+            """<div><blockquote>This quote
+might be split
+in multiple
+lines
+
+---Someone</blockquote></div>""",
             node.to_html()
         )
+
 
     def test_single_header_block(self):
         md = "# Header for some document"

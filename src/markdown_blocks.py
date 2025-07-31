@@ -26,7 +26,7 @@ def block_to_block_type(block: str) -> BlockType:
     for i, line in enumerate(block.split("\n")):
         numeral = f"{i + 1}."
 
-        is_quote_block =  is_quote_block and line.startswith("> ")
+        is_quote_block =  is_quote_block and line.startswith(">")
         is_unordered_block = is_unordered_block and line.startswith("- ")
         is_ordered_block = is_ordered_block and line.startswith(numeral)
 

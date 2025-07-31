@@ -34,9 +34,8 @@ def markdown_to_html_node(markdown : str) -> HTMLNode:
             case BlockType.QUOTE:
                 lines = [line.strip("> ") for line in md_block.split("\n")]
                 text_nodes = text_to_textnodes("\n".join(lines))
-                ParentNode("p", text_nodes_to_html_nodes(text_nodes))
                 html_nodes.append(
-                    ParentNode("blockquote", [ParentNode("p", text_nodes_to_html_nodes(text_nodes))])
+                    ParentNode("blockquote", [*text_nodes_to_html_nodes(text_nodes)])
                 )
 
             case BlockType.UNORDERED_LIST:
